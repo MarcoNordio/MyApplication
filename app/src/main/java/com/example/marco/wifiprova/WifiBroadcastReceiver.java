@@ -3,6 +3,7 @@ package com.example.marco.wifiprova;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 
 /**
@@ -29,6 +30,16 @@ public class WifiBroadcastReceiver extends BroadcastReceiver {
 
             // The peer list has changed!  We should probably do something about
             // that.
+            if(mainActivity.mManager!=null)
+            {
+                mainActivity.mManager.requestPeers(mainActivity.mChannel, new WifiP2pManager.PeerListListener() {
+                    @Override
+                    public void onPeersAvailable(WifiP2pDeviceList peers) {
+                        mainActivity.RefreshDeviceListView(peers);
+                    }
+                });
+            }
+
 
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
 
