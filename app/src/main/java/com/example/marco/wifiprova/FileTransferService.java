@@ -17,11 +17,11 @@ import java.net.Socket;
 public class FileTransferService extends IntentService {
 
     private static final int SOCKET_TIMEOUT = 5000;
-    public static final String ACTION_SEND_FILE = "com.example.pc_2.basicmetronome.SEND_FILE";
-    public static final String EXTRAS_FILE_PATH = "file_url";
+    public static final String ACTION_START_SYNC= "start_sync";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";
-    public static final String BPMS = "BMPS";
+    public static final String CLIENT_ADDRESS="client_address";
+    public static final String CLIENT_PORT="client_port";
 
     public FileTransferService(String name) {
         super(name);
@@ -39,9 +39,8 @@ public class FileTransferService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         Context context = getApplicationContext();
-        if (intent.getAction().equals(ACTION_SEND_FILE)) {
+        if (intent.getAction().equals(ACTION_START_SYNC)) {
             DataOutputStream stream=null;
-            String bpmsToSend=intent.getExtras().getString(BPMS);
             //String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
             String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
             Socket socket = new Socket();
@@ -54,7 +53,6 @@ public class FileTransferService extends IntentService {
                 socket.connect((new InetSocketAddress(host, port)));
                 //Log.d(TabConnection.TAG, "Client socket - " + socket.isConnected());
                 stream =new DataOutputStream(socket.getOutputStream());
-                stream.writeUTF(bpmsToSend);
                 //Log.d(TabConnection.TAG, "Client: Data written");
             } catch (IOException e) {
                 //Log.e(TabConnection.TAG, e.getMessage());

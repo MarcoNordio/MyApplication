@@ -1,6 +1,7 @@
 package com.example.marco.wifiprova;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         btnSync=(Button) findViewById(R.id.btn_scan);
         btnSync.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                StartSync();
             }
         });
 
@@ -262,5 +263,13 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
                 }
             }
         });
+    }
+
+    public void StartSync(){
+        Intent serviceIntent = new Intent(getApplicationContext(), FileTransferService.class);
+        //serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
+        //serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,info.groupOwnerAddress.getHostAddress());
+        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+        startService(serviceIntent);
     }
 }
