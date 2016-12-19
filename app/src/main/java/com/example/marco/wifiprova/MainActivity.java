@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     Button btnScan;
     Button btnDeleteGroup;
     Button btnSync;
+    Button btnCreateGroup;
 
     String TipoDispositivo;
 
@@ -39,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     WifiP2pManager.Channel mChannel;
     WifiP2pManager mManager;
 
-    WifiBroadcastReceiver receiver;
+    ServerBroadcastReceiver ServerReceiver;
+    ClientBroadcastReceiver ClientReceiver;
 
     private final IntentFilter intentFilter = new IntentFilter();
 
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         SetBtnScan();
         SetBtnDeleteGroup();
         SetButtonSync();
+        SetBtnCreateGroup();
 
 
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
@@ -70,14 +73,14 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     @Override
     protected void onResume() {
         super.onResume();
-        receiver = new WifiBroadcastReceiver(this);
-        registerReceiver(receiver, intentFilter);
+        //receiver = new ServerBroadcastReceiver(this);
+        //registerReceiver(receiver, intentFilter);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        unregisterReceiver(receiver);
+        //unregisterReceiver(receiver);
     }
 
 
@@ -97,7 +100,33 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     }
 
 
+    public void SetBtnCreateGroup(){
+        ServerReceiver= new ServerBroadcastReceiver(this);
+        registerReceiver(ServerReceiver,intentFilter);
+
+        btnCreateGroup=(Button) findViewById(R.id.btn_create_group);
+        btnCreateGroup.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mManager.createGroup(mChannel, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(MainActivity.this, "Group created", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(int reason) {
+                        Toast.makeText(MainActivity.this, "Group NOT created", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
+    }
+
     public void SetBtnScan(){
+        ClientReceiver= new ClientBroadcastReceiver(this);
+        registerReceiver(ClientReceiver,intentFilter);
+
         btnScan= (Button) findViewById(R.id.btn_scan);
         btnScan.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -145,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
 
 
     public void SetButtonSync(){
-        btnSync=(Button) findViewById(R.id.btn_scan);
+        btnSync=(Button) findViewById(R.id.start_sync);
         btnSync.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 StartSync();
@@ -162,39 +191,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                //TODO implementare click
-                final WifiP2pConfig config = new WifiP2pConfig();
-                config.deviceAddress = DeviceList.get(position).deviceAddress;
-                config.wps.setup = WpsInfo.PBC;
-                
-                mManager.createGroup(mChannel, new WifiP2pManager.ActionListener() {
-                    @Override
-                    public void onSuccess() {
-                        Toast.makeText(MainActivity.this, "Group created", Toast.LENGTH_SHORT).show();
-                        Connect();
-                        mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
-                            @Override
-                            public void onGroupInfoAvailable(WifiP2pGroup group) {
-                                if(group!=null) {
-                                    if (group.isGroupOwner()) {
-                                        Toast.makeText(MainActivity.this, group.getClientList().toString(), Toast.LENGTH_SHORT).show();
-                                        TipoDispositivo="SERVER";
-                                    }
-                                    else {
-                                        Toast.makeText(MainActivity.this, "NON sono group owner", Toast.LENGTH_SHORT).show();
-                                        TipoDispositivo="CLIENT";
-                                    }
-                                }
-
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onFailure(int reason) {
-                        Toast.makeText(MainActivity.this, "Group NOT created", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Connect();
             }
         });
     }
@@ -267,9 +264,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
 
     public void StartSync(){
         Intent serviceIntent = new Intent(getApplicationContext(), FileTransferService.class);
-        //serviceIntent.setAction(FileTransferService.ACTION_SEND_FILE);
-        //serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_ADDRESS,info.groupOwnerAddress.getHostAddress());
-        serviceIntent.putExtra(FileTransferService.EXTRAS_GROUP_OWNER_PORT, 8988);
+        serviceIntent.setAction(FileTransferService.ACTION_START_SYNC);
+        serviceIntent.putExtra(FileTransferService.CLIENT_ADDRESS,DeviceList.get(0).deviceAddress);
+        serviceIntent.putExtra(FileTransferService.CLIENT_PORT, 8988);
         startService(serviceIntent);
     }
 }

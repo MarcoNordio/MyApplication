@@ -26,6 +26,13 @@
             android:layout_weight="0.59" />
 
         <Button
+            android:text="crea gruppo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_create_group"
+            android:layout_weight="0.09" />
+
+        <Button
             android:text="Scan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,7 +1,11 @@
 package com.example.marco.wifiprova;
 import android.content.Context;
+import android.database.CursorJoiner;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Toast;
+
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -22,25 +26,31 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String>  {
 
     @Override
     protected String doInBackground(Void... params) {
+        DataInputStream inputstream = null;
+        ServerSocket serverSocket=null;
         try {
 
-            ServerSocket serverSocket = new ServerSocket(8888);
+            serverSocket = new ServerSocket(8988);
+            //Log.d(TabConnection.TAG, "Server: Socket opened");
             Socket client = serverSocket.accept();
+            //Log.d(TabConnection.TAG, "Server: connection done");
 
-            InputStream inputstream = client.getInputStream();
+            inputstream = new DataInputStream(client.getInputStream());
+            //Log.d(TabConnection.TAG, "server: copying files ");
+            String str = inputstream.readUTF();
             serverSocket.close();
+            return str;
         } catch (IOException e) {
             Toast.makeText(context, "Non sono riuscito a farmi trasferire il file", Toast.LENGTH_SHORT).show();
             return null;
         }
-        return null;
     }
 
 
     @Override
     protected void onPostExecute(String result) {
         if (result != null) {
-
+            Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
         }
 
 

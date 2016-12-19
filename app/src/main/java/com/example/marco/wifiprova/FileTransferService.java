@@ -41,10 +41,9 @@ public class FileTransferService extends IntentService {
         Context context = getApplicationContext();
         if (intent.getAction().equals(ACTION_START_SYNC)) {
             DataOutputStream stream=null;
-            //String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
-            String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
+            String host = intent.getExtras().getString(CLIENT_ADDRESS);
             Socket socket = new Socket();
-            int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
+            int port = intent.getExtras().getInt(CLIENT_PORT);
 
             try {
                 //Log.d(TabConnection.TAG, "Opening client socket - ");
@@ -53,6 +52,7 @@ public class FileTransferService extends IntentService {
                 socket.connect((new InetSocketAddress(host, port)));
                 //Log.d(TabConnection.TAG, "Client socket - " + socket.isConnected());
                 stream =new DataOutputStream(socket.getOutputStream());
+                stream.writeUTF("sono la stringa magica");
                 //Log.d(TabConnection.TAG, "Client: Data written");
             } catch (IOException e) {
                 //Log.e(TabConnection.TAG, e.getMessage());
