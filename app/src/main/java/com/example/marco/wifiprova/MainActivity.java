@@ -10,6 +10,7 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pGroup;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     WifiP2pManager.Channel mChannel;
     WifiP2pManager mManager;
 
-
+    WifiP2pInfo info;
 
     ServerBroadcastReceiver ServerReceiver;
     ClientBroadcastReceiver ClientReceiver;
@@ -108,12 +109,16 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     public void SetBtnCreateGroup(){
         ServerReceiver= new ServerBroadcastReceiver(this);
         registerReceiver(ServerReceiver,intentFilter);
-        serverTask= new FileServerAsyncTask(this);
+
 
 
         btnCreateGroup=(Button) findViewById(R.id.btn_create_group);
         btnCreateGroup.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                serverTask= new FileServerAsyncTask(getApplicationContext());
+                serverTask.execute();
+
                 mManager.createGroup(mChannel, new WifiP2pManager.ActionListener() {
                     @Override
                     public void onSuccess() {
@@ -137,6 +142,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         btnScan= (Button) findViewById(R.id.btn_scan);
         btnScan.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+
+
                 CleanDeviceList();
                 mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
                   @Override
@@ -272,11 +280,11 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     public void StartSync(){
         Intent serviceIntent = new Intent(getApplicationContext(), FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_START_SYNC);
-        ArrayList<WifiP2pDevice> dl= new ArrayList<>();
+        /*ArrayList<WifiP2pDevice> dl= new ArrayList<>();
         for (WifiP2pDevice dev:clientList) {
             dl.add(dev);
-        }
-        serviceIntent.putExtra(FileTransferService.CLIENT_ADDRESS,dl.get(0).deviceAddress);
+        }*/
+        serviceIntent.putExtra(FileTransferService.CLIENT_ADDRESS,info.groupOwnerAddress.getHostAddress());
         serviceIntent.putExtra(FileTransferService.CLIENT_PORT, 8988);
         this.startService(serviceIntent);
     }

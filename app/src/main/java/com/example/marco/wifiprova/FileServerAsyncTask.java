@@ -28,18 +28,19 @@ public class FileServerAsyncTask extends AsyncTask<Void, Void, String>  {
     protected String doInBackground(Void... params) {
         DataInputStream inputstream = null;
         ServerSocket serverSocket=null;
+        Log.d(MainActivity.TAG,"Sono entrato dentro server");
         try {
 
             serverSocket = new ServerSocket(8988);
-            //Log.d(TabConnection.TAG, "Server: Socket opened");
+            Log.d(MainActivity.TAG, "Server: Socket opened");
             Socket client = serverSocket.accept();
-            //Log.d(TabConnection.TAG, "Server: connection done");
+            Log.d(MainActivity.TAG, "Server: connection done");
 
             inputstream = new DataInputStream(client.getInputStream());
             //Log.d(TabConnection.TAG, "server: copying files ");
             String str = inputstream.readUTF();
             serverSocket.close();
-            return str;
+            return client.getInetAddress().toString();
         } catch (IOException e) {
             Toast.makeText(context, "Non sono riuscito a farmi trasferire il file", Toast.LENGTH_SHORT).show();
             return null;

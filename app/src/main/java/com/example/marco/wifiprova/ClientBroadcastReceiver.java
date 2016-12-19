@@ -46,6 +46,7 @@ public class ClientBroadcastReceiver extends BroadcastReceiver {
                 public void onConnectionInfoAvailable(WifiP2pInfo info) {
                     //Log.d(TAG, ITAG + "info:" + info.toString());
                     if (info.groupFormed){
+                        mainActivity.info=info;
                         //device connected
                         //searchService();
                         //mClient = new Client(info.groupOwnerAddress,Server.PORT);
