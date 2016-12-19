@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     ListView listView;
     Button btnScan;
     Button btnDeleteGroup;
+    Button btnSync;
+
+    String TipoDispositivo;
 
     ArrayAdapter<String> adapter;
     ArrayList<WifiP2pDevice> DeviceList = new ArrayList<>();
@@ -40,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     private final IntentFilter intentFilter = new IntentFilter();
 
 
+    FileServerAsyncTask serverTask=null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         SetListView();
         SetBtnScan();
         SetBtnDeleteGroup();
+        SetButtonSync();
 
 
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
@@ -135,6 +142,17 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         });
     }
 
+
+    public void SetButtonSync(){
+        btnSync=(Button) findViewById(R.id.btn_scan);
+        btnSync.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+            }
+        });
+
+    }
+
     public void SetListView(){
         listView=(ListView) findViewById(R.id.listView);
         adapter= new ArrayAdapter<String>(getApplicationContext(),R.layout.row,R.id.textViewList,DeviceListString);
@@ -157,10 +175,14 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
                             @Override
                             public void onGroupInfoAvailable(WifiP2pGroup group) {
                                 if(group!=null) {
-                                    if (group.isGroupOwner())
+                                    if (group.isGroupOwner()) {
                                         Toast.makeText(MainActivity.this, group.getClientList().toString(), Toast.LENGTH_SHORT).show();
-                                    else
-                                        Toast.makeText(MainActivity.this, "non sono un group owner", Toast.LENGTH_SHORT).show();
+                                        TipoDispositivo="SERVER";
+                                    }
+                                    else {
+                                        Toast.makeText(MainActivity.this, "NON sono group owner", Toast.LENGTH_SHORT).show();
+                                        TipoDispositivo="CLIENT";
+                                    }
                                 }
 
                             }
@@ -230,10 +252,14 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
         mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
             @Override
             public void onGroupInfoAvailable(WifiP2pGroup group) {
-                if(group!=null)
+                if(group!=null) {
                     Toast.makeText(MainActivity.this, "Sei parte di un gruppo", Toast.LENGTH_SHORT).show();
-                else
+                    TipoDispositivo="SERVER";
+                }
+                else {
                     Toast.makeText(MainActivity.this, "NON fai pate di un gruppo", Toast.LENGTH_SHORT).show();
+                    TipoDispositivo="CLIENT";
+                }
             }
         });
     }

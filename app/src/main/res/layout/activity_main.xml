@@ -37,5 +37,12 @@
             android:layout_height="wrap_content"
             android:id="@+id/btn_delete_group" />
 
+        <Button
+            android:text="start sync"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/start_sync"
+            android:layout_weight="0.03" />
+
     </LinearLayout>
 </RelativeLayout>
