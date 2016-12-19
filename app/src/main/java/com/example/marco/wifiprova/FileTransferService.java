@@ -17,7 +17,7 @@ import java.net.Socket;
 public class FileTransferService extends IntentService {
 
     private static final int SOCKET_TIMEOUT = 5000;
-    public static final String ACTION_START_SYNC= "start_sync";
+    public static final String ACTION_START_SYNC= "com.example.marco.wifiprova.SEND_FILE";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";
     public static final String CLIENT_ADDRESS="client_address";
@@ -37,7 +37,7 @@ public class FileTransferService extends IntentService {
      */
     @Override
     protected void onHandleIntent(Intent intent) {
-
+        Log.d(MainActivity.TAG, "sono entrato qui dentro");
         Context context = getApplicationContext();
         if (intent.getAction().equals(ACTION_START_SYNC)) {
             DataOutputStream stream=null;

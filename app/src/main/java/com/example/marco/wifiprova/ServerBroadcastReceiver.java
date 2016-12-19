@@ -50,6 +50,7 @@ public class ServerBroadcastReceiver extends BroadcastReceiver {
                             @Override
                             public void onGroupInfoAvailable(WifiP2pGroup group) {
                                 Toast.makeText(mainActivity, "Sono il Group Owner", Toast.LENGTH_SHORT).show();
+                                mainActivity.SaveGroupInfo(group);
 
                             }
                         });

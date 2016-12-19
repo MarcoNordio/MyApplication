@@ -25,6 +25,8 @@ import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity implements WifiP2pManager.PeerListListener{
 
+    public static final String TAG = "wifidirect";
+
     ListView listView;
     Button btnScan;
     Button btnDeleteGroup;
@@ -36,9 +38,12 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     ArrayAdapter<String> adapter;
     ArrayList<WifiP2pDevice> DeviceList = new ArrayList<>();
     ArrayList<String> DeviceListString = new ArrayList<>();
+    Collection<WifiP2pDevice> clientList;
 
     WifiP2pManager.Channel mChannel;
     WifiP2pManager mManager;
+
+
 
     ServerBroadcastReceiver ServerReceiver;
     ClientBroadcastReceiver ClientReceiver;
@@ -103,6 +108,8 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     public void SetBtnCreateGroup(){
         ServerReceiver= new ServerBroadcastReceiver(this);
         registerReceiver(ServerReceiver,intentFilter);
+        serverTask= new FileServerAsyncTask(this);
+
 
         btnCreateGroup=(Button) findViewById(R.id.btn_create_group);
         btnCreateGroup.setOnClickListener(new View.OnClickListener() {
@@ -265,8 +272,17 @@ public class MainActivity extends AppCompatActivity implements WifiP2pManager.Pe
     public void StartSync(){
         Intent serviceIntent = new Intent(getApplicationContext(), FileTransferService.class);
         serviceIntent.setAction(FileTransferService.ACTION_START_SYNC);
-        serviceIntent.putExtra(FileTransferService.CLIENT_ADDRESS,DeviceList.get(0).deviceAddress);
+        ArrayList<WifiP2pDevice> dl= new ArrayList<>();
+        for (WifiP2pDevice dev:clientList) {
+            dl.add(dev);
+        }
+        serviceIntent.putExtra(FileTransferService.CLIENT_ADDRESS,dl.get(0).deviceAddress);
         serviceIntent.putExtra(FileTransferService.CLIENT_PORT, 8988);
-        startService(serviceIntent);
+        this.startService(serviceIntent);
+    }
+
+    public void SaveGroupInfo(WifiP2pGroup group) {
+        //qui ci arrivo quando il gruppo è formato
+        clientList= group.getClientList();
     }
 }
